@@ -14,14 +14,25 @@ class DataLoaderPolyvore(DataLoader):
         assert phase in ('train', 'valid', 'test')
         np.random.seed(1234)
 
-        adjacency_file = os.path.join(self.data_path, 'adj_{}.npz'.format(phase))
-        feature_file = os.path.join(self.data_path, 'X_{}.npz'.format(phase))
-        question_file = os.path.join(self.data_path, 'questions_test.json')
-        question_resample_file = os.path.join(
-            self.data_path, 'questions_RESAMPLED_test.json')
+        adjacency_file         = os.path.join(self.data_path, 'adj_{}.npz'.format(phase))
+        feature_file           = os.path.join(self.data_path, 'X_{}.npz'.format(phase))
+        question_file          = os.path.join(self.data_path, 'questions_test.json')
+        question_resample_file = os.path.join(self.data_path, 'questions_RESAMPLED_test.json')
 
-        adj_matrix = sp.load_npz(adjacency_file).astype(np.int32)
+        adj_matrix    = sp.load_npz(adjacency_file).astype(np.int32)
+        # [[0 1 1 ... 0 0 0]
+        # [1 0 1 ... 0 0 0]
+        # [1 1 0 ... 0 0 0]
+        #  ...
+        # [0 0 0 ... 0 1 1]
+        # [0 0 0 ... 1 0 1]
+        # [0 0 0 ... 1 1 0]]
+        # print(adj_matrix.todense())
+        # print(adj_matrix.todense().shape) # tran: (8923, 8923), valid: (8923, 8923), test:(18169, 18169)
+        
+        # image feature -> resent fc : 2048
         node_features = sp.load_npz(feature_file)
+        
         with open(question_file) as f:
             self.questions = json.load(f)
         with open(question_resample_file) as f:
