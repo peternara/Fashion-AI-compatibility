@@ -251,14 +251,14 @@ def get_questions(data_dir, resample=False):
     with open(question_file) as f:
         question_data = json.load(f)
     
-    questions = []
-
+    questions      = []
     outfitId2Urlid = {}
 
     for outfit in json_data:
         for item in outfit['items']:
+            # outfit id > outfit_id
             outfit_id = '{}_{}'.format(outfit['set_id'], item['index'])
-            # get url id
+            # get url id(item or image) in outfit > id_
             _, id_ = item['image'].split('id=')
             outfitId2Urlid[outfit_id] = id_ 
     
