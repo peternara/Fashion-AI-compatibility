@@ -70,7 +70,25 @@ def resample_fill_the_blank(data_dir):
     
     with open(question_file) as f:
         question_data = json.load(f)
-    
+    '''
+    [
+    {
+        "question": [
+            "119704139_1",
+            "119704139_3",
+            "119704139_4",
+            "119704139_5"
+        ],
+        "answers": [
+            "119704139_2",
+            "148511719_1",
+            "206598043_4",
+            "106043455_1"
+        ],
+        "blank_position": 2
+    },
+    ''' 
+
     questions_resampled = []
 
     print("Number of questions: {}".format(len(question_data)))
