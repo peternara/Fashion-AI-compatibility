@@ -260,6 +260,10 @@ def get_questions(data_dir, resample=False):
             outfit_id = '{}_{}'.format(outfit['set_id'], item['index'])
             # get url id(item or image) in outfit > id_
             _, id_ = item['image'].split('id=')
+            
+            # '119704139_1': '102972440'
+            #  outfit 안의 item(outfit_id = 119704139_1)에 매핑된 이미지 ID(id_ = 102972440)
+            #       > 119704139_1 은 119704139 이부분은 outfit, 1은 item
             outfitId2Urlid[outfit_id] = id_ 
     
     for ques in question_data:
