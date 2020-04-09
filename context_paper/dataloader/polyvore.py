@@ -45,7 +45,8 @@ class DataLoaderPolyvore(DataLoader):
         
         with open(question_resample_file) as f:
             self.questions_resampled = json.load(f)
-
+        # print(len(self.questions_resampled)) # 3076
+        
         setattr(self, '{}_adj'.format(phase), adj_matrix)
         setattr(self, '{}_features'.format(phase), node_features)
 
