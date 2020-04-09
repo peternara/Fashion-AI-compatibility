@@ -32,6 +32,7 @@ class DataLoaderPolyvore(DataLoader):
         
         # image feature -> resent fc : 2048
         node_features = sp.load_npz(feature_file)
+        #print('node_features : ' , node_features.shape) # tran:(84497, 2048) , valid:(8923, 2048), test:(18169, 2048)
         
         with open(question_file) as f:
             self.questions = json.load(f)
