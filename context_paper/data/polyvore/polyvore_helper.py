@@ -270,8 +270,11 @@ def get_questions(data_dir, resample=False):
         q = []
         for q_id in ques['question']:  
             # q_id = OutfitID-Index, map to url id
+            # print(q_id) # 119704139_1
             q_id = outfitId2Urlid[q_id]
-            q.append(q_id)
+            # print(q_id) # 102972440
+            q.append(q_id)        
+        # print(q) # ['102972440', '91303250', '94989504', '103184729']
         
         set_id = ques['question'][0].split('_')[0]
 
