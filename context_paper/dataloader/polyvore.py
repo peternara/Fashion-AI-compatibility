@@ -36,6 +36,13 @@ class DataLoaderPolyvore(DataLoader):
         
         with open(question_file) as f:
             self.questions = json.load(f)
+        # [[1, 3, 4, 2], [0, 13557, 50, 17940], [2, 1, 4, 1], 2] > 하나가..   
+        # print(len(self.questions)) > 3076개 있다. 의미는??
+        # [1, 3, 4, 2]          > List of url ids of question items (len N)
+        # [0, 13557, 50, 17940] > List of url ids of possible answers (len 4)
+        # [2, 1, 4, 1]          > List of positions where these answers corresponds to (len 4)
+        # 2                     > desired blank position 
+        
         with open(question_resample_file) as f:
             self.questions_resampled = json.load(f)
 
