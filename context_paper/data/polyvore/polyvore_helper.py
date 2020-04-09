@@ -111,7 +111,7 @@ def resample_fill_the_blank(data_dir):
             q.append(q_id)
         
         set_id = q_id.split('_')[0]  # all q_ids in a question belong to the same outfit
-
+        
         new_ques['question'] = q 
 
         ans = []
@@ -277,16 +277,23 @@ def get_questions(data_dir, resample=False):
         # print(q) # ['102972440', '91303250', '94989504', '103184729']
         
         set_id = ques['question'][0].split('_')[0]
-
-        a = []
+        # print(ques['question'][0]) # 119704139_1
+        # print(set_id) # 119704139
+        
+        a               = []
         blank_positions = []
 
         for i, a_id in enumerate(ques['answers']):
             if i == 0:
                 # correct choice
                 assert a_id.split('_')[0] == set_id 
-            pos = int(a_id.split('_')[1])
-            a_id = outfitId2Urlid[a_id]
+                
+            # print(a_id) # 119704139_2
+            # print(a_id.split('_')[1]) # 2   
+            pos = int(a_id.split('_')[1]) # item in outfit
+            a_id = outfitId2Urlid[a_id]   # item in outfit에 대한 image id
+            # print(pos, a_id) # 2 103394173
+            
             a.append(a_id)
             blank_positions.append(pos)
         
@@ -297,7 +304,13 @@ def get_questions(data_dir, resample=False):
         #    - List of positions where these answers corresponds to (len 4)
         #    - desired blank position
         questions.append([q, a, blank_positions, ques['blank_position']])
-    
+        # print(q) # ['102972440', '91303250', '94989504', '103184729']  # item in outfit에 대한 image id
+        # print(a) # ['103394173', '127110314', '156949162', '96522232'] # item in outfit에 대한 image id
+        # print(blank_positions) # [2, 1, 4, 1] == ['103394173', '127110314', '156949162', '96522232']
+        # print(ques['blank_position']) # 2
+        
+    # print(questions) # [[['102972440', '91303250', '94989504', '103184729'], ['103394173', '127110314', '156949162', '96522232'], [2, 1, 4, 1], 2],,,,,    
+
     return questions
 
 def get_compatibility(data_dir, resample=False):
