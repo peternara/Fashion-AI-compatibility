@@ -354,6 +354,11 @@ def create_test(args, data_dir, id2idx, resample=False):
     
     # create fill_in_the_blank data
     questions = get_questions(data_dir, resample=resample)
+    # [[['102972440', '91303250', '94989504', '103184729'], ['103394173', '127110314', '156949162', '96522232'], [2, 1, 4, 1], 2],,,,,
+    #   > ['102972440', '91303250', '94989504', '103184729'] # questiion # item in outfit에 대한 image id
+    #   > ['103394173', '127110314', '156949162', '96522232'] # answers # item in outfit에 대한 image id
+    #   > [2, 1, 4, 1] == ['103394173', '127110314', '156949162', '96522232'] # answers
+    #   > 2 # desired blank position
 
     for i in range(len(questions)):
         assert len(questions[i]) == 4, 'Expect a question data contains 4 lists, but got {}'.format(len(questions))
