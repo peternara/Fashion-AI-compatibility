@@ -122,7 +122,9 @@ class DataLoaderPolyvore(DataLoader):
         print("Done!")
         print("Time elapsed: {}\n".format(time.time() - s_time))
 
-        # build a dummy graph for GNN. In its adjacency matrix, only positive_edges for message passing is marked as positive, i.e., connected, 
+        # 나머지 반에 대한 positive 정보.
+        # build a dummy graph for GNN. In its adjacency matrix, 
+        #       only positive_edges for message passing is marked as positive, i.e., connected, 
         # the other edges are simply missing in the dummy graph.
         # note that since the graph is undirected, the dummpy adjacency matrix should be 
         # symmetric.
@@ -137,7 +139,7 @@ class DataLoaderPolyvore(DataLoader):
         adj.eliminate_zeros()
 
         # create ground-truth labels for edges to predict
-        eval_labels = np.append(loss_pos_labels, neg_labels)
+        eval_labels  = np.append(loss_pos_labels, neg_labels)
         eval_row_idx = np.append(loss_pos_row_idx, neg_row_idx)
         eval_col_idx = np.append(loss_pos_col_idx, neg_col_idx)
 
