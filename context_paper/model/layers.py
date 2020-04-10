@@ -56,6 +56,13 @@ class GCN(nn.Module):
 
             tmp = torch.matmul(x, w)  # X * Theta
             adj_s = supports[i]
+            # print(supports[i])       # torch.sparse_coo > matrix
+            # tensor(indices=tensor([[    0,     1,     2,  ..., 84494, 84495, 84496],
+            #                        [    0,     1,     2,  ..., 84494, 84495, 84496]]),
+            #       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+            #       device='cuda:0', size=(84497, 84497), nnz=84497, layout=torch.sparse_coo)
+            # print(supports[i].shape) # torch.Size([84497, 84497])
+            
             tmp = torch.sparse.mm(adj_s, tmp)  # As * X * Theta
             supports_out.append(tmp)
         
