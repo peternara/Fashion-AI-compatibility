@@ -70,6 +70,7 @@ if DATASET in ('polyvore', 'fashiongen'):
         raise NotImplementedError('Support to fashiongen dataset will be added soon!')
 
     # node features, message-passing adj, ground-truth labels, start node idx, end node idx of edges to evaluate loss
+    #  > message-passing(?메세지전달) adj에서 message-passing의 의미는?
     train_features, train_mp_adj, train_labels, train_row_idx, train_col_idx = dl.get_phase('train')
     val_features, val_mp_adj, val_labels, val_row_idx, val_col_idx = dl.get_phase('valid')
 
