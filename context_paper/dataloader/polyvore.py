@@ -52,6 +52,11 @@ class DataLoaderPolyvore(DataLoader):
 
         # get lower tiangle of the adj matrix to avoid duplicate edges
         # since adj is symmetric
+        # sp.tril  > https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.tril.html#scipy.sparse.tril
+        #          > Matrix를 대각선(diagonal) 기준으로 상단을 0 으로 만든다.
+        #          > k = 0 corresponds to the main diagonal
+        # 여기서, Matrix를 대각선(diagonal) 기준으로 상단을 0 으로 만든다.
+        #      이유는 directial graph A->B, B->A는 중복된다고 보고 이 중 하나를 지우려고..
         setattr(self, 'lower_{}_adj'.format(phase), sp.tril(adj_matrix).tocsr())
 
     def get_phase(self, phase):
@@ -63,10 +68,13 @@ class DataLoaderPolyvore(DataLoader):
         assert phase in ('train', 'valid', 'test')
 
         lower_adj = getattr(self, 'lower_{}_adj'.format(phase))
-
+        #print(lower_adj.shape) # (84497, 84497)
+        
         # get positive edges 
         pos_row_idx, pos_col_idx = lower_adj.nonzero()
-        pos_labels = np.array(lower_adj[pos_row_idx, pos_col_idx]).squeeze()
+        # nonzero()
+        #   > Matrix(lower_adj)내에 0이 아닌 Value를 가진 위치(i,j)를 (row=pos_row_idx,col=pos_col_idx) 로 각각 리턴        
+        pos_labels = np.array(lower_adj[pos_row_idx, pos_col_idx]).squeeze()        
         # split the positive edges into two parts
         # part 1 is used for message passing - GNN 
         # part 2 is used as prediction target, i.e., we predict connection prob
