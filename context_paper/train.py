@@ -70,56 +70,71 @@ if DATASET in ('polyvore', 'fashiongen'):
         raise NotImplementedError('Support to fashiongen dataset will be added soon!')
 
     # node features, message-passing adj, ground-truth labels, start node idx, end node idx of edges to evaluate loss
-    #  > message-passing(?메세지전달) adj에서 message-passing의 의미는?
+    #  > message-passing(?메세지전달) adj에서 message-passing의 의미는?    
     train_features, train_mp_adj, train_labels, train_row_idx, train_col_idx = dl.get_phase('train')
+    # train_mp_adj 는 나머지 half graph 정보 = message-passing adj
+    # print(train_mp_adj.shape) # (84497, 84497)
+    # train_labels, train_row_idx, train_col_idx
+    #   - graph의 node들의 개수가 338488 인데 이들 반절은 pos vs neg로 만든 형태
+    # print(train_labels.shape) # (338488,)
+    # print(train_row_idx.shape) # (338488,)
+    # print(train_row_idx) # [24749. 39950. 36779. ...  5722. 60576. 44047.]
+    # print(train_col_idx.shape) # (338488,)
+    # print(train_col_idx) # [12189. 39947.  8606. ...  5511.  8237. 20453.]
+
     val_features, val_mp_adj, val_labels, val_row_idx, val_col_idx = dl.get_phase('valid')
 
     # normalize features
     train_features, mean, std = dl.normalize_feature(train_features, return_moments=True)
-    val_features = dl.normalize_feature(val_features, mean=mean, std=std, return_moments=False)
+    # print(train_features.shape) # (84497, 2048)
+    # mean, std > predict에서 필요할것으로 보여 실제로는 저장되어야할 정보
+    # print('train feature : ' ,  mean, std) # [[0.59618651 0.64498316 0.68714354 ... 0.32978797 0.72110322 0.57665217]] [[0.51395941 0.53921698 0.53976958 ... 0.2645195  0.86538214 0.44306204]]
+    # print('\t' , mean.shape, std.shape) # (1, 2048) (1, 2048)
+    
+    val_features              = dl.normalize_feature(val_features, mean=mean, std=std, return_moments=False)
 
 else:
     raise NotImplementedError('Dataloader for dataset {} is not supported yet!'.format(DATASET))
 
 # convert features to tensors
 train_features = torch.from_numpy(train_features).to(DEVICE)
-val_features = torch.from_numpy(val_features).to(DEVICE)
-train_labels = torch.from_numpy(train_labels).float().to(DEVICE)
-val_labels = torch.from_numpy(val_labels).float().to(DEVICE)
+val_features   = torch.from_numpy(val_features).to(DEVICE)
+train_labels   = torch.from_numpy(train_labels).float().to(DEVICE)
+val_labels     = torch.from_numpy(val_labels).float().to(DEVICE)
 
-train_row_idx = torch.from_numpy(train_row_idx).long().to(DEVICE)
-train_col_idx = torch.from_numpy(train_col_idx).long().to(DEVICE)
-val_row_idx = torch.from_numpy(val_row_idx).long().to(DEVICE)
-val_col_idx = torch.from_numpy(val_col_idx).long().to(DEVICE)
+train_row_idx  = torch.from_numpy(train_row_idx).long().to(DEVICE)
+train_col_idx  = torch.from_numpy(train_col_idx).long().to(DEVICE)
+val_row_idx    = torch.from_numpy(val_row_idx).long().to(DEVICE)
+val_col_idx    = torch.from_numpy(val_col_idx).long().to(DEVICE)
 
 # get support adjacency matrix [A0, ..., AS] 
 train_support = compute_degree_support(train_mp_adj, DEGREE, adj_self_connections=ADJ_SELF_CONNECTIONS)
-val_support = compute_degree_support(val_mp_adj, DEGREE, adj_self_connections=ADJ_SELF_CONNECTIONS)
+val_support   = compute_degree_support(val_mp_adj, DEGREE, adj_self_connections=ADJ_SELF_CONNECTIONS)
 
 # normalize these support adjacency matrices, except the first one which is symmetric
 for i in range(1, len(train_support)):
     train_support[i] = normalize_nonsym_adj(train_support[i])
-    val_support[i] = normalize_nonsym_adj(val_support[i])
+    val_support[i]   = normalize_nonsym_adj(val_support[i])
 
 val_support = [csr_to_sparse_tensor(adj).to(DEVICE) for adj in val_support]
 
 num_supports = len(train_support)
 
 settings = {
-    'num_support': num_supports,  
-    'dropout': DROP,
-    'batch_norm': BATCH_NORM,
+    'num_support'  : num_supports,  
+    'dropout'      : DROP,
+    'batch_norm'   : BATCH_NORM,
     'learning_rate': LR,
-    'wd': WD,
+    'wd'           : WD,
 }
 
 
 # create model
 model = CompatibilityGAE(
-    input_dim=train_features.shape[1],
-    hidden=HIDDEN,
-    num_classes=2,
-    settings=settings
+    input_dim   = train_features.shape[1],
+    hidden      = HIDDEN,
+    num_classes = 2,
+    settings    = settings
 )
 model.to(DEVICE)
 model.train()
@@ -127,10 +142,10 @@ model.train()
 print("\nModel: ")
 print(model)
 
-best_val_acc = 0
-best_epoch = 0
+best_val_acc       = 0
+best_epoch         = 0
 best_val_train_acc = 0
-best_train_acc = 0 
+best_train_acc     = 0 
 
 tmp = csr_to_sparse_tensor(train_support[0]).to(DEVICE)
 for epoch in range(NB_EPOCHS):
@@ -153,20 +168,20 @@ for epoch in range(NB_EPOCHS):
     with torch.no_grad():
         model.eval()
         valid_pred = model.predict(val_features, val_support, val_row_idx, val_col_idx)
-        valid_acc = model.accuracy(valid_pred, val_labels)
+        valid_acc  = model.accuracy(valid_pred, val_labels)
     model.train()
 
     print("Epoch: {} -- Train Loss: {:.4f} -- Train Acc: {:.4f} -- Valid Acc: {:.4f}".format(epoch, train_avg_loss, train_acc, valid_acc))
 
     if valid_acc > best_val_acc:
-        best_val_acc = valid_acc
-        best_epoch = epoch 
+        best_val_acc       = valid_acc
+        best_epoch         = epoch 
         best_val_train_acc = train_acc 
         # save model
         torch.save(
             {
                 'state_dict': model.state_dict(),
-                'args': args
+                'args'      : args
             }, 
             os.path.join(args['save_path'], 'best_model.pth')
         )
