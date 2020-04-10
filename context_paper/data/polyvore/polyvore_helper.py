@@ -326,6 +326,8 @@ def get_compatibility(data_dir, resample=False):
         for item in outfit['items']:
             outfit_id = '{}_{}'.format(outfit['set_id'], item['index'])
             _, id_    = item['image'].split('id=')
+            
+            # outfitID_num : outfit안의 items ID 이를 고유의 ID로 전환 
             outfitId2Urlid[outfit_id] = id_
     
     if resample:
@@ -346,6 +348,7 @@ def get_compatibility(data_dir, resample=False):
             # ['126319344', '115808504', '124973053', '125587844', '107656548', '122080392', '123823763', '125301380'] 1
             # ['99032985', '167145247', '157542036', '92453741', '112382277'] 0
 
+    # [(['102972440', '103394173', '91303250', '94989504', '103184729'], 1),,,         
     return outfits
 
 # id2idx : _idx 는 유니크한 이미지 단위 id와 매핑된 순서대로 0~N까지 매긴 정보(여기서 매긴 새로운 ID)
@@ -387,6 +390,7 @@ def create_test(args, data_dir, id2idx, resample=False):
     # [(['102972440', '103394173', '91303250', '94989504', '103184729'], 1),,,
      
     for i in range(len(outfits)):  # (items, label)
+        # print(i, outfits[i][0]) # 0 ['102972440', '103394173', '91303250', '94989504', '103184729']
         for j in range(len(outfits[i][0])):
             outfits[i][0][j] = id2idx[outfits[i][0][j]]
     
