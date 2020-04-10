@@ -28,10 +28,23 @@ def normalize_feature(feats, mean=None, std=None, return_moments=False):
 def compute_degree_support(adj, S, adj_self_connections=False, verbose=True):
     if verbose:
         print("Compute adjacency matrix up to {} degrees, i.e., A^{}".format(S, S))
+        
     n_nodes = adj.shape[0]
+    # print(n_nodes) # 84497
+    
     # [A0, A1, A2, ..., AS]
     supports = [sp.identity(n_nodes)]
     
+    #[[1. 0. 0. ... 0. 0. 0.]
+    # [0. 1. 0. ... 0. 0. 0.]
+    # [0. 0. 1. ... 0. 0. 0.]
+    # ...
+    # [0. 0. 0. ... 1. 0. 0.]
+    # [0. 0. 0. ... 0. 1. 0.]
+    # [0. 0. 0. ... 0. 0. 1.]]
+    # print(supports[0].toarray())
+    # print(supports[0].toarray().shape) # (84497, 84497)
+
     if S == 0:
         # only consider A0
         return supports
