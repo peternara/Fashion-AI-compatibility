@@ -150,10 +150,7 @@ for i in range(1, len(train_support)):
     #  [0.         0.         0.         ... 0.2        0.2        0.        ]
     #  [0.         0.         0.         ... 0.16666667 0.         0.16666667]]
 
-    val_support[i]   = normalize_nonsym_adj(val_support[i])
-
-
-    
+    val_support[i]   = normalize_nonsym_adj(val_support[i])  
 
 val_support = [csr_to_sparse_tensor(adj).to(DEVICE) for adj in val_support]
 
