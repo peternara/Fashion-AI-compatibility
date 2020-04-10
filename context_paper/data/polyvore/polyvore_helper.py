@@ -167,15 +167,14 @@ def resample_compatibility(data_dir):
     """
     print('Start resampling of compatibility ...')
     orig_file = os.path.join(data_dir, 'fashion_compatibility_prediction.txt')
-    new_file = os.path.join(
-        data_dir, 'fashion_compatibility_prediction_RESAMPLED.txt')
+    new_file  = os.path.join(data_dir, 'fashion_compatibility_prediction_RESAMPLED.txt')
     
     # find valid and invalid outfits
-    valid_outfits = []
+    valid_outfits   = []
     invalid_outfits = []
     with open(orig_file, 'r') as f:
         for line in f:
-            res = line.strip().split(' ')
+            res          = line.strip().split(' ')
             label, items = int(res[0]), res[1:]
             if label == 1:
                 valid_outfits.append(items)
@@ -186,14 +185,14 @@ def resample_compatibility(data_dir):
     with open(os.path.join(data_dir, 'test_no_dup.json')) as f:
         json_data = json.load(f)
     
-    item2cat = {}
+    item2cat  = {}
     cat_items = {}
 
     for outfit in json_data:
         set_id = outfit['set_id']
         for item in outfit['items']:
-            index = item['index']
-            id_ = '{}_{}'.format(set_id, index)
+            index         = item['index']
+            id_           = '{}_{}'.format(set_id, index)
             item2cat[id_] = item['categoryid']
 
             if id_ not in cat_items:
@@ -326,20 +325,18 @@ def get_compatibility(data_dir, resample=False):
     for outfit in json_data:
         for item in outfit['items']:
             outfit_id = '{}_{}'.format(outfit['set_id'], item['index'])
-            _, id_ = item['image'].split('id=')
+            _, id_    = item['image'].split('id=')
             outfitId2Urlid[outfit_id] = id_
     
     if resample:
-        compat_file = os.path.join(
-            data_dir, 'fashion_compatibility_prediction_RESAMPLED.txt')
+        compat_file = os.path.join(data_dir, 'fashion_compatibility_prediction_RESAMPLED.txt')
     else:
-        compat_file = os.path.join(
-            data_dir, 'fashion_compatibility_prediction.txt')
+        compat_file = os.path.join(data_dir, 'fashion_compatibility_prediction.txt')
     
     outfits = []
     with open(compat_file) as f:
         for line in f:
-            res = line.strip().split(' ')
+            res   = line.strip().split(' ')
             label = int(res[0])
             assert label in (0, 1)
             items = [outfitId2Urlid[outfit_id] for outfit_id in res[1:]]
@@ -347,6 +344,8 @@ def get_compatibility(data_dir, resample=False):
     
     return outfits
 
+# id2idx : _idx 는 유니크한 이미지 단위 id와 매핑된 순서대로 0~N까지 매긴 정보(여기서 매긴 새로운 ID)
+#         > 그래서 0~부터 시작하는 Image ID
 def create_test(args, data_dir, id2idx, resample=False):
     if resample:
         resample_fill_the_blank(data_dir)
@@ -367,19 +366,22 @@ def create_test(args, data_dir, id2idx, resample=False):
         for j in range(2):
             # j = 0 - question items
             # j = 1 - answer items
-            for k in range(len(questions[i][j])):
+            for k in range(len(questions[i][j])): # questions은 id2idx을 이용해서 (유니크한 이미지 단위 id)에서 0~N까지 매긴 정보로 변환
+                #print(questions[i][j][k]) # 156824361 # image id
                 questions[i][j][k] = id2idx[questions[i][j][k]]
-        
+                # print(i, j, k, questions[i][j][k]) # 0 0 0 2 or 0 1 1 13557
+                
     question_file = os.path.join(args.root, args.save_path, 'questions_{}.json'.format(args.phase))
     if resample:
-        question_file = question_file.replace(
-            'questions', 'questions_RESAMPLED')
+        question_file = question_file.replace('questions', 'questions_RESAMPLED')
     
     with open(question_file, 'w') as f:
         json.dump(questions, f)
     
     # create outfit compatibility prediction data
     outfits = get_compatibility(data_dir, resample=resample)
+    # [(['102972440', '103394173', '91303250', '94989504', '103184729'], 1),,,
+     
     for i in range(len(outfits)):  # (items, label)
         for j in range(len(outfits[i][0])):
             outfits[i][0][j] = id2idx[outfits[i][0][j]]
@@ -486,9 +488,10 @@ x = np.zeros((idx, args.d))
 print("Processing graph node feature matrix and graph adjacency matrix ... ")
 
 for id_ in edges:
-    start_idx = id2idx[id_]
-
-    rel_ids = edges[id_]
+    start_idx = id2idx[id_] # _idx 는 유니크한 이미지 단위 id와 매핑된 순서대로 0~N까지 매긴 정보(여기서 매긴 새로운 ID)
+    #print(id_, start_idx)  # 139866939 18145
+    
+    rel_ids      = edges[id_]
     x[start_idx] = features[start_idx]
 
     for to_id in rel_ids:
@@ -503,12 +506,12 @@ print("Done !")
 
 # save the adjacency matrix
 save_path = os.path.join(args.root, args.save_path, 'adj_{}.npz'.format(args.phase))
-adj = adj.tocsr()
+adj       = adj.tocsr()
 save_npz(save_path, adj)
 
 # save feature matrix
 save_path = os.path.join(args.root, args.save_path, 'X_{}.npz'.format(args.phase))
-x = csr_matrix(x)
+x         = csr_matrix(x)
 save_npz(save_path, x)
 
 if args.phase == 'test':
