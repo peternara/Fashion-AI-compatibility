@@ -73,7 +73,11 @@ class DataLoaderPolyvore(DataLoader):
         # get positive edges 
         pos_row_idx, pos_col_idx = lower_adj.nonzero()
         # nonzero()
-        #   > Matrix(lower_adj)내에 0이 아닌 Value를 가진 위치(i,j)를 (row=pos_row_idx,col=pos_col_idx) 로 각각 리턴        
+        #   > Matrix(lower_adj)내에 0이 아닌 Value를 가진 위치(i,j)를 (row=pos_row_idx,col=pos_col_idx) 로 각각 리턴 
+        # (84497, 84497) 크기의 Matrix(lower_adj)에서,
+        # print(len(pos_row_idx), pos_row_idx) # 338488 [    1     2     2 ... 84496 84496 84496]
+        # print(len(pos_col_idx), pos_col_idx) # 338488 [    0     0     1 ... 84493 84494 84495]
+        
         pos_labels = np.array(lower_adj[pos_row_idx, pos_col_idx]).squeeze()        
         # split the positive edges into two parts
         # part 1 is used for message passing - GNN 
@@ -83,7 +87,7 @@ class DataLoaderPolyvore(DataLoader):
         # This prevents ground truth information leakage to the model !!!
         print("Split positive edges ... ", end='\t')
         num_pos = len(pos_labels)
-        perm = np.arange(num_pos)
+        perm    = np.arange(num_pos)
         np.random.shuffle(perm)
         pos_labels, pos_row_idx, pos_col_idx = pos_labels[perm], pos_row_idx[perm], pos_col_idx[perm]
 
@@ -101,6 +105,14 @@ class DataLoaderPolyvore(DataLoader):
         neg_labels = np.zeros((num_neg_train,))
         neg_row_idx = np.zeros((num_neg_train,))
         neg_col_idx = np.zeros((num_neg_train,))
+        #print(num_neg_train)     # 169244
+        #print(neg_labels)        # [0. 0. 0. ... 0. 0. 0.]
+        #print(neg_labels.shape)  # (169244,)
+        #print(neg_row_idx)       # [0. 0. 0. ... 0. 0. 0.]
+        #print(neg_row_idx.shape) # (169244,)
+        #print(neg_col_idx)       # [0. 0. 0. ... 0. 0. 0.]
+        #print(neg_col_idx.shape) # (169244,)
+      
 
         s_time = time.time()
         for i in range(num_neg_train):
