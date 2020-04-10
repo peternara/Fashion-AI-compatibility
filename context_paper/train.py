@@ -26,17 +26,13 @@ parser.add_argument('-hi', '--hidden', type=int, nargs='+', default=[350, 350, 3
 parser.add_argument('-drop', '--dropout', type=float, default=0.5, help='dropout probability')
 parser.add_argument('-deg', '--degree', type=int, default=1, help='degree of convolution, i.e., number of support nodes.')
 parser.add_argument('-sd', '--support-dropout', type=float, default=0.15, help='Use dropout on support adjacency matrix, dropping all the connections from some nodes')
-parser.add_argument('--data-dir', type=str,
-                    default='/home/alan/Downloads/fashion/polyvore/dataset2')
-parser.add_argument('--save-path', type=str,
-                    default='/home/alan/Downloads/fashion/polyvore/')
+parser.add_argument('--data-dir', type=str, default='/home/alan/Downloads/fashion/polyvore/dataset2')
+parser.add_argument('--save-path', type=str, default='/home/alan/Downloads/fashion/polyvore/')
 parser.add_argument('--device', type=str, default='cuda:0')
 
 mg = parser.add_mutually_exclusive_group(required=False)
-mg.add_argument('-bn', '--batch-norm', action='store_true',
-                help='Option to turn on batchnorm in GCN layers')
-mg.add_argument('-no-bn', '--no-batch-norm', action='store_false',
-                help='Option to turn off batchnorm in GCN layers')
+mg.add_argument('-bn', '--batch-norm', action='store_true', help='Option to turn on batchnorm in GCN layers')
+mg.add_argument('-no-bn', '--no-batch-norm', action='store_false', help='Option to turn off batchnorm in GCN layers')
 parser.set_defaults(batch_norm=True)
 
 args = parser.parse_args()
@@ -109,6 +105,24 @@ val_col_idx    = torch.from_numpy(val_col_idx).long().to(DEVICE)
 
 # get support adjacency matrix [A0, ..., AS] 
 train_support = compute_degree_support(train_mp_adj, DEGREE, adj_self_connections=ADJ_SELF_CONNECTIONS)
+# print(len(train_support)) # 2
+# print(train_support[0].todense()) # 0 위치에 I 행렬을 가지고 있다.
+# [[1. 0. 0. ... 0. 0. 0.]
+#  [0. 1. 0. ... 0. 0. 0.]
+#  [0. 0. 1. ... 0. 0. 0.]
+#  ...
+#  [0. 0. 0. ... 1. 0. 0.]
+#  [0. 0. 0. ... 0. 1. 0.]
+#  [0. 0. 0. ... 0. 0. 1.]]
+# print(train_support[1].todense()) # 0 실제 graph metrix 정보
+# [[1. 0. 1. ... 0. 0. 0.]
+#  [0. 1. 1. ... 0. 0. 0.]
+#  [1. 1. 1. ... 0. 0. 0.]
+#  ...
+#  [0. 0. 0. ... 1. 1. 1.]
+#  [0. 0. 0. ... 1. 1. 0.]
+#  [0. 0. 0. ... 1. 0. 1.]]
+
 val_support   = compute_degree_support(val_mp_adj, DEGREE, adj_self_connections=ADJ_SELF_CONNECTIONS)
 
 # normalize these support adjacency matrices, except the first one which is symmetric
