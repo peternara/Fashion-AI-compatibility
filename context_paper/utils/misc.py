@@ -53,7 +53,8 @@ def compute_degree_support(adj, S, adj_self_connections=False, verbose=True):
     supports = [sp.identity(n_nodes), adj.astype(np.float64) + adj_self_connections * sp.identity(n_nodes)]
 
     prev = adj 
-    for _ in range(S-1):
+    # S = 1 이면 working하지 않는다. > 현재 S=1인듯.
+    for _ in range(S-1): 
         pow = prev.dot(adj)  # A^n = A^(n-1) * A
         # (A^n)_{i,j} reflects the number of n-hop paths connecting node i and j
         # if self-connection is allowed, we can move <=n-1 steps on a node itself and then move to the target node
