@@ -35,6 +35,7 @@ class DataLoader(metaclass=abc.ABCMeta):
         u = np.random.randint(num_nodes)
         v = np.random.randint(num_nodes)
 
+        # positive edge에서 다른 item를 넣어 negative item을 가진 edge를 만드는것같다. 
         # check if (u, v) or (v, u) is an positive edge. If so, find another edge that is negative.
         # note that (u, v) and (v, u) represent the same undirectional edge, and 
         # lower_adj is only the lower triangular part of the full symmetric adjacency matrix 
