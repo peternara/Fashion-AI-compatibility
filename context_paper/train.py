@@ -107,6 +107,7 @@ val_col_idx    = torch.from_numpy(val_col_idx).long().to(DEVICE)
 train_support = compute_degree_support(train_mp_adj, DEGREE, adj_self_connections=ADJ_SELF_CONNECTIONS)
 # print(len(train_support)) # 2
 # print(train_support[0].todense()) # 0 위치에 I 행렬을 가지고 있다.
+# (84497, 84497)
 # [[1. 0. 0. ... 0. 0. 0.]
 #  [0. 1. 0. ... 0. 0. 0.]
 #  [0. 0. 1. ... 0. 0. 0.]
@@ -115,6 +116,7 @@ train_support = compute_degree_support(train_mp_adj, DEGREE, adj_self_connection
 #  [0. 0. 0. ... 0. 1. 0.]
 #  [0. 0. 0. ... 0. 0. 1.]]
 # print(train_support[1].todense()) # 0 실제 graph metrix 정보
+# (84497, 84497)
 # [[1. 0. 1. ... 0. 0. 0.]
 #  [0. 1. 1. ... 0. 0. 0.]
 #  [1. 1. 1. ... 0. 0. 0.]
@@ -124,11 +126,34 @@ train_support = compute_degree_support(train_mp_adj, DEGREE, adj_self_connection
 #  [0. 0. 0. ... 1. 0. 1.]]
 
 val_support   = compute_degree_support(val_mp_adj, DEGREE, adj_self_connections=ADJ_SELF_CONNECTIONS)
+# val_support[0] == val_support[1] == (8923, 8923)
 
 # normalize these support adjacency matrices, except the first one which is symmetric
 for i in range(1, len(train_support)):
+    # print(i, train_support[i].shape) # 1 (84497, 84497)
+    # print(train_support[i].toarray())    
+    # [[1. 0. 1. ... 0. 0. 0.]
+    #  [0. 1. 1. ... 0. 0. 0.]
+    #  [1. 1. 1. ... 0. 0. 0.]
+    #  ...
+    #  [0. 0. 0. ... 1. 1. 1.]
+    #  [0. 0. 0. ... 1. 1. 0.]
+    #  [0. 0. 0. ... 1. 0. 1.]]
     train_support[i] = normalize_nonsym_adj(train_support[i])
+    # print(i, train_support[i].shape) # 1 (84497, 84497) 
+    # print(train_support[i].toarray()) # normalize 되어 나온다.
+    # [[0.2        0.         0.2        ... 0.         0.         0.        ]
+    #  [0.         0.01176471 0.01176471 ... 0.         0.         0.        ]
+    #  [0.16666667 0.16666667 0.16666667 ... 0.         0.         0.        ]
+    #  ...
+    #  [0.         0.         0.         ... 0.16666667 0.16666667 0.16666667]
+    #  [0.         0.         0.         ... 0.2        0.2        0.        ]
+    #  [0.         0.         0.         ... 0.16666667 0.         0.16666667]]
+
     val_support[i]   = normalize_nonsym_adj(val_support[i])
+
+
+    
 
 val_support = [csr_to_sparse_tensor(adj).to(DEVICE) for adj in val_support]
 
