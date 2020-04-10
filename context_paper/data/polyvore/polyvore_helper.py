@@ -340,8 +340,12 @@ def get_compatibility(data_dir, resample=False):
             label = int(res[0])
             assert label in (0, 1)
             items = [outfitId2Urlid[outfit_id] for outfit_id in res[1:]]
+            
             outfits.append((items, label))
-    
+            # print(items, label)
+            # ['126319344', '115808504', '124973053', '125587844', '107656548', '122080392', '123823763', '125301380'] 1
+            # ['99032985', '167145247', '157542036', '92453741', '112382277'] 0
+
     return outfits
 
 # id2idx : _idx 는 유니크한 이미지 단위 id와 매핑된 순서대로 0~N까지 매긴 정보(여기서 매긴 새로운 ID)
